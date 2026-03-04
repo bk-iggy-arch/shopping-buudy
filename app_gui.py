@@ -35,32 +35,51 @@ budget_input_value = st.number_input("今日の予算はいくらねー？ (円)
 # --- 💡 ここからが「わかりやすさ」の改良ポイント ---
 
 # 1. 英語の表記を隠して、日本語で案内するための「見た目」を作る（CSS）
+# --- 💡 視覚的な「白い四角」を強調するデザイン改良 ---
+
 st.markdown("""
     <style>
-    /* 標準の「Browse files」ボタンや英語テキストを目立たなくし、独自の案内を強調する */
+    /* 1. ファイルアップロードの枠全体を「大きな白い四角」にする */
     .stFileUploader section {
-        background-color: #fff9e6; /* 優しい黄色 */
-        border: 2px dashed #ffb300; /* オレンジの点線 */
-        border-radius: 15px;
+        background-color: #ffffff !important; /* 真っ白にする */
+        border: 4px solid #ffb300 !important; /* 太いオレンジの枠線で囲む */
+        border-radius: 20px !important;
+        padding: 20px !important;
+        min-height: 150px !important; /* 高さを出して押しやすくする */
     }
-    .stFileUploader label {
-        display: none; /* 標準のラベルを隠す */
+
+    /* 2. 中にある英語のテキスト（Drag and drop...）を完全に消す */
+    .stFileUploader section div div {
+        display: none !important;
     }
-    /* 自作の案内メッセージのスタイル */
-    .guide-text {
-        color: #d32f2f; /* 目立つ赤色 */
-        font-weight: bold;
-        font-size: 20px;
+    .stFileUploader section span {
+        display: none !important;
+    }
+
+    /* 3. 代わりに、枠の真ん中にデカデカと日本語を表示する */
+    .stFileUploader section::before {
+        content: "📸 この白い四角を\\A押してね！"; /* \\A は改行コード */
+        white-space: pre;
+        display: block;
         text-align: center;
-        padding: 10px;
-        background-color: #ffeb3b; /* 注意を引く黄色 */
-        border-radius: 10px;
-        margin-bottom: 10px;
+        color: #333333;
+        font-weight: bold;
+        font-size: 24px;
+        margin-top: 20px;
+    }
+
+    /* 4. 標準の小さなボタン（Browse files）を透明にして、枠のどこを押しても反応するようにする */
+    .stFileUploader button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0; /* 透明にする */
+        cursor: pointer;
     }
     </style>
-    <div class="guide-text">👇 ここを押して、写真を撮ってね！</div>
     """, unsafe_allow_html=True)
-
 # 2. ファイルアップロード（中身はそのまま、見た目だけCSSで装飾される）
 uploaded_image_data = st.file_uploader("写真を選んでね", type=["jpg", "jpeg", "png"])
 
