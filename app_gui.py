@@ -46,23 +46,22 @@ st.title(app_title_text)
 
 # --- ここから下を書き換え ---
 
+# --- ここから下を書き換え ---
+
 # ユーザーが画面上で入力する予算金額（初期値3000円）
 budget_input_value = st.number_input("今日の予算はいくらねー？ (円)", min_value=0, value=3000, step=100)
 
-# PC内の画像ファイル（またはスマホのカメラ・写真）をアップロードするためのウィジェット
-uploaded_image_data = st.file_uploader("値札の画像を選んでね！", type=["jpg", "jpeg", "png"])
+# スマホのカメラをアプリ内で直接起動するためのウィジェット
+captured_image_data = st.camera_input("商品の値札をパシャッと撮ってね！")
 
-# 画像がアップロードされた場合のみ実行される処理ブロック
-if uploaded_image_data:
+# カメラで画像が撮影された場合のみ実行される処理ブロック
+if captured_image_data:
     # ユーザーを待たせている間に表示するメッセージ文字列
     processing_message = "📸 画像を見てるさぁ。ちょっと待っててね..."
     st.write(processing_message)
     
     # PILライブラリを使用してメモリ上に展開された画像オブジェクト
-    opened_image_object = PIL.Image.open(uploaded_image_data)
-    
-    # 画面上にアップロードされた画像をプレビュー表示する処理（確認用）
-    st.image(opened_image_object, caption="選んだ画像", use_container_width=True)
+    opened_image_object = PIL.Image.open(captured_image_data)
     
     # AI関数を実行して得られた、うちなーぐちの回答テキスト
     final_okinawa_answer = analyze_item_with_ai_okinawa(opened_image_object, budget_input_value)
