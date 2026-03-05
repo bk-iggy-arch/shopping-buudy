@@ -11,21 +11,34 @@ load_dotenv()
 api_key_value = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=api_key_value)
 
-# 【AI解析関数】うちなーぐちで商品と予算を判定する
+# 【関数の機能：前】この関数は、撮影された画像から商品名と価格を抜き出し、予算と比較した結果を「整数」かつ「うちなーぐち」で生成する。
 def analyze_item_with_ai_okinawa(image_data_input, current_budget_amount):
+    # 【関数の機能：後】端数（小数点）を排除し、子供がレジで出しやすい金額を提案して呼び出し元に返す。
+    
+    # Gemini 2.5 Flashモデルのインスタンス作成
     generative_model_instance = genai.GenerativeModel('models/gemini-2.5-flash')
     
+    # AIへの指示（プロンプト）。小数点を切り上げ、整数で答えるよう制約を追加。
     ai_instruction_prompt = f"""
-    あなたは沖縄の子供向けのお買い物支援バディです。
-    買い物予算は {current_budget_amount} 円です。
-    1. 商品名 2. 値段 3. 支払いの提案と予算相談 を、
-    親しみやすい「うちなーぐち」で答えてね。
-    予算オーバーなら「こわいさー！😱💦」とユーモアを交えて相談して。
+    あなたは沖縄の子供向けのお買い物支援バディです。画像から情報を抜き出し、以下の形式で回答してください。
+    なお、今回の買い物予算は {current_budget_amount} 円です。
+    
+    1. 商品名: (具体的な名前を特定してね)
+    2. 値段: (【重要】小数点以下は切り上げて「整数」のみ、数値だけで答えて)
+    3. 支払いの提案と予算相談: 
+       - 値段が予算({current_budget_amount}円)以下の場合は、お釣りが少なくなるスマートな出し方を提案して。
+       - 値段が予算を超えている場合は、「だからよー、こんな高いの、こわいさー！😱💦」とユーモアを交えて優しく相談して。
+    
+    ※親しみやすい「うちなーぐち（沖縄方言）」で、子供に寄り添って答えてね。
     """
     
+    # 画像と指示をAIに投げて解析を実行
     ai_analysis_response = generative_model_instance.generate_content([ai_instruction_prompt, image_data_input])
-    return ai_analysis_response.text
-
+    
+    # 解析結果のテキストを抽出
+    final_text_answer = ai_analysis_response.text
+    
+    return final_text_answer
 # アプリのタイトル
 st.title("🌺 AIお買い物バディ")
 
